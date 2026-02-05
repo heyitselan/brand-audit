@@ -447,10 +447,6 @@
                 <div id="firstImpressionsCompact" style="margin-top: 25px; text-align: left; border-top: 1px solid var(--border); padding-top: 20px;"></div>
             </div>
 
-            <div class="section" id="screenshotsSection">
-                <h2>Above The Fold</h2>
-                <div id="screenshotsContent" style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px;"></div>
-            </div>
 
 
             <div class="section" id="chartSection">
@@ -602,19 +598,6 @@
             // Display verdict
             if (data.verdict) {
                 document.getElementById('verdict').textContent = data.verdict;
-            }
-
-            // Display screenshots (website only)
-            if (data.screenshots) {
-                const screenshotsHtml = Object.entries(data.screenshots).map(([name, info], i) => `
-                    <div style="flex: 0 0 auto; text-align: center;">
-                        <a href="${info.url}" target="_blank" style="text-decoration: none;">
-                            <div style="font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; color: var(--primary); ${i === 0 ? 'font-weight: 700;' : ''}">${name}</div>
-                            ${info.image ? `<img src="data:image/jpeg;base64,${info.image}" style="width: 280px; height: auto; border: 2px solid ${i === 0 ? 'var(--accent)' : 'var(--border)'}; border-radius: 4px;">` : '<div style="width: 280px; height: 175px; background: var(--secondary); display: flex; align-items: center; justify-content: center; color: #999;">No screenshot</div>'}
-                        </a>
-                    </div>
-                `).join('');
-                document.getElementById('screenshotsContent').innerHTML = screenshotsHtml;
             }
 
             // Display compact first impressions in score card
