@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Competitive Brand Audit - Off-Menu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1a1a;
+            --secondary: #f4f4f4;
+            --accent: #ff4444;
+            --text: #2a2a2a;
+            --border: #e0e0e0;
+            --highlight: #fff3cd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Pro', serif;
+            background: var(--secondary);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 30px;
+        }
+
+        header {
+            margin-bottom: 60px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .subtitle {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #666;
+        }
+
+        .input-section {
+            background: white;
+            padding: 40px;
+            border: 2px solid var(--primary);
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .input-section::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            background: var(--accent);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .input-section:hover::before {
+            opacity: 0.1;
+        }
+
+        label {
+            display: block;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        input[type="url"],
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid var(--border);
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            transition: border-color 0.3s;
+            background: white;
+        }
+
+        input[type="url"]:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        input::placeholder {
+            color: #999;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 700;
+            width: 100%;
+        }
+
+        button:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+        }
+
+        .score-card {
+            background: white;
+            border: 3px solid var(--primary);
+            padding: 50px;
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .score-card::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            right: -6px;
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--primary);
+            z-index: -1;
+        }
+
+        .score-number {
+            font-size: 5rem;
+            font-weight: 600;
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .score-number.score-low { color: #ef4444; }
+        .score-number.score-mid { color: #f59e0b; }
+        .score-number.score-high { color: #22c55e; }
+
+        .score-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .section {
+            background: white;
+            border: 2px solid var(--primary);
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .comparison-item {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--secondary);
+        }
+
+        .company-name {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .company-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .highlight {
+            background: var(--highlight);
+            padding: 2px 4px;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .unique-phrases {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .phrase-tag {
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .error {
+            background: #ffe0e0;
+            border: 2px solid var(--accent);
+            padding: 20px;
+            margin-bottom: 20px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        footer {
+            margin-top: 80px;
+            padding-top: 30px;
+            border-top: 2px solid var(--border);
+            text-align: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        footer a {
+            color: var(--primary);
+            text-decoration: none;
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .cta-section {
+            background: white;
+            border: 3px solid var(--primary);
+            padding: 50px;
+            text-align: center;
+            margin-top: 40px;
+            position: relative;
+        }
+
+        .cta-section::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            right: -6px;
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--accent);
+            z-index: -1;
+        }
+
+        .cta-section h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            border: none;
+            padding: 0;
+        }
+
+        .cta-section p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 25px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 18px 40px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .cta-button:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .section-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #888;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .input-section, .section, .score-card, .cta-section {
+                padding: 25px;
+            }
+
+            .score-number {
+                font-size: 3.5rem;
+            }
+
+            #takeawaysContent > div {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Competitive Brand Audit</h1>
+            <div class="subtitle">See how differentiated you really are</div>
+        </header>
+
+        <div class="input-section">
+            <form id="auditForm">
+                <label for="companyUrl">Your Website</label>
+                <input type="text" id="companyUrl" placeholder="yourcompany.com" required>
+
+                <label for="companyName">Your Company Name</label>
+                <input type="text" id="companyName" placeholder="Your Company" required style="margin-bottom: 30px;">
+
+                <div style="border-top: 2px solid var(--border); padding-top: 25px; margin-top: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <label style="margin: 0;">Competitors (enter 1-3)</label>
+                        <button type="button" id="suggestBtn" style="background: transparent; color: var(--primary); border: 1px solid var(--border); padding: 8px 15px; font-size: 0.75rem; width: auto;">Suggest Competitors</button>
+                    </div>
+
+                    <div id="suggestionsContainer" style="display: none; margin-bottom: 20px; padding: 15px; background: var(--secondary); border-radius: 4px;">
+                        <div style="font-family: 'Space Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #666; margin-bottom: 10px;">Suggested competitors (click to add):</div>
+                        <div id="suggestionsList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="comp1Name" placeholder="Competitor 1 name" required>
+                        <input type="text" id="comp1Url" placeholder="competitor1.com" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="comp2Name" placeholder="Competitor 2 name (optional)">
+                        <input type="text" id="comp2Url" placeholder="competitor2.com">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 30px;">
+                        <input type="text" id="comp3Name" placeholder="Competitor 3 name (optional)">
+                        <input type="text" id="comp3Url" placeholder="competitor3.com">
+                    </div>
+                </div>
+
+                <button type="submit">Run Audit</button>
+                <button type="button" id="tryExampleBtn" style="margin-top: 10px; background: transparent; color: var(--primary); border: 2px solid var(--border);">Try an Example</button>
+            </form>
+        </div>
+
+        <div class="loading">
+            <div class="spinner"></div>
+            <div id="loadingStatus">Starting audit...</div>
+            <div id="loadingSteps" style="margin-top: 20px; text-align: left; max-width: 300px; margin-left: auto; margin-right: auto;">
+                <div class="loading-step" id="step1" style="padding: 8px 0; color: #ccc;">○ Screenshotting websites</div>
+                <div class="loading-step" id="step2" style="padding: 8px 0; color: #ccc;">○ Analyzing messaging</div>
+                <div class="loading-step" id="step3" style="padding: 8px 0; color: #ccc;">○ Analyzing visuals</div>
+                <div class="loading-step" id="step4" style="padding: 8px 0; color: #ccc;">○ Comparing brands</div>
+                <div class="loading-step" id="step5" style="padding: 8px 0; color: #ccc;">○ Generating takeaways</div>
+            </div>
+        </div>
+
+        <div id="errorContainer"></div>
+
+        <div class="results" id="results">
+            <div class="score-card">
+                <div class="score-number" id="scoreNumber">--</div>
+                <div class="score-label">Differentiation Score</div>
+                <p style="margin-top: 20px; font-size: 1.1rem; font-style: italic;" id="verdict"></p>
+                <div id="firstImpressionsCompact" style="margin-top: 25px; text-align: left; border-top: 1px solid var(--border); padding-top: 20px;"></div>
+            </div>
+
+            <div class="section" id="screenshotsSection">
+                <h2>Above The Fold</h2>
+                <div id="screenshotsContent" style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 10px;"></div>
+            </div>
+
+
+            <div class="section" id="chartSection">
+                <h2>Side by Side</h2>
+                <div style="overflow-x: auto;">
+                    <table id="comparisonChart" style="width: 100%; border-collapse: collapse; font-size: 0.9rem;"></table>
+                </div>
+            </div>
+
+            <div class="section" id="verdictSection">
+                <h2>The Verdict</h2>
+                <div id="verdictContent"></div>
+            </div>
+
+            <div class="section" id="takeawaysSection" style="background: var(--primary); color: white;">
+                <h2 style="color: white; border-bottom-color: rgba(255,255,255,0.3);">What This Means For You</h2>
+                <div id="takeawaysContent"></div>
+            </div>
+
+            <div class="cta-section">
+                <h2>Want to stand out?</h2>
+                <p>Let's talk about how to sharpen your positioning and differentiate from competitors.</p>
+                <a href="https://calendly.com/off-menu/diagnostic" target="_blank" class="cta-button">Book a Call</a>
+                <div style="margin-top: 20px;">
+                    <button type="button" id="runAgainBtn" style="background: transparent; color: var(--primary); border: 2px solid var(--primary); padding: 12px 30px;">Run Another Audit</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            Built by <a href="https://offmenu.substack.com" target="_blank">Off-Menu</a>
+        </footer>
+    </div>
+
+    <script>
+        const API_ENDPOINT = '/api/audit'; // You'll need to set this up
+
+        document.getElementById('auditForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const companyUrl = document.getElementById('companyUrl').value;
+            const companyName = document.getElementById('companyName').value;
+
+            // Gather competitors
+            const competitors = [];
+            for (let i = 1; i <= 3; i++) {
+                const name = document.getElementById(`comp${i}Name`).value.trim();
+                const url = document.getElementById(`comp${i}Url`).value.trim();
+                if (name && url) {
+                    competitors.push({ name, url });
+                }
+            }
+
+            if (competitors.length === 0) {
+                alert('Please enter at least one competitor');
+                return;
+            }
+
+            // Hide previous results and errors
+            document.getElementById('results').classList.remove('active');
+            document.getElementById('errorContainer').innerHTML = '';
+
+            // Show loading
+            const loading = document.querySelector('.loading');
+            loading.classList.add('active');
+
+            try {
+                resetLoadingSteps();
+                updateLoadingStatus('Screenshotting websites...', 1);
+
+                // Simulate step progress (actual progress happens server-side)
+                setTimeout(() => updateLoadingStatus('Analyzing messaging...', 2), 3000);
+                setTimeout(() => updateLoadingStatus('Analyzing visuals...', 3), 8000);
+                setTimeout(() => updateLoadingStatus('Comparing brands...', 4), 15000);
+                setTimeout(() => updateLoadingStatus('Generating takeaways...', 5), 22000);
+
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ companyUrl, companyName, competitors })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                loading.classList.remove('active');
+                displayResults(data);
+                
+            } catch (error) {
+                loading.classList.remove('active');
+                showError(error.message);
+            }
+        });
+
+        function updateLoadingStatus(message, step = 0) {
+            document.getElementById('loadingStatus').textContent = message;
+            // Update step indicators
+            for (let i = 1; i <= 5; i++) {
+                const stepEl = document.getElementById('step' + i);
+                if (i < step) {
+                    stepEl.style.color = '#22c55e';
+                    stepEl.textContent = '✓' + stepEl.textContent.substring(1);
+                } else if (i === step) {
+                    stepEl.style.color = 'var(--primary)';
+                    stepEl.textContent = '●' + stepEl.textContent.substring(1);
+                } else {
+                    stepEl.style.color = '#ccc';
+                    stepEl.textContent = '○' + stepEl.textContent.substring(1);
+                }
+            }
+        }
+
+        function resetLoadingSteps() {
+            for (let i = 1; i <= 5; i++) {
+                const stepEl = document.getElementById('step' + i);
+                stepEl.style.color = '#ccc';
+                const text = stepEl.textContent.substring(1);
+                stepEl.textContent = '○' + text;
+            }
+        }
+
+        function showError(message) {
+            const errorHtml = `
+                <div class="error">
+                    <strong>Error:</strong> ${message}
+                </div>
+            `;
+            document.getElementById('errorContainer').innerHTML = errorHtml;
+        }
+
+        function displayResults(data) {
+            // Display score with color coding
+            const scoreEl = document.getElementById('scoreNumber');
+            scoreEl.textContent = data.score;
+            scoreEl.className = 'score-number';
+            if (data.score <= 40) {
+                scoreEl.classList.add('score-low');
+            } else if (data.score <= 70) {
+                scoreEl.classList.add('score-mid');
+            } else {
+                scoreEl.classList.add('score-high');
+            }
+
+            // Display verdict
+            if (data.verdict) {
+                document.getElementById('verdict').textContent = data.verdict;
+            }
+
+            // Display screenshots (website only)
+            if (data.screenshots) {
+                const screenshotsHtml = Object.entries(data.screenshots).map(([name, info], i) => `
+                    <div style="flex: 0 0 auto; text-align: center;">
+                        <a href="${info.url}" target="_blank" style="text-decoration: none;">
+                            <div style="font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; color: var(--primary); ${i === 0 ? 'font-weight: 700;' : ''}">${name}</div>
+                            ${info.image ? `<img src="data:image/jpeg;base64,${info.image}" style="width: 280px; height: auto; border: 2px solid ${i === 0 ? 'var(--accent)' : 'var(--border)'}; border-radius: 4px;">` : '<div style="width: 280px; height: 175px; background: var(--secondary); display: flex; align-items: center; justify-content: center; color: #999;">No screenshot</div>'}
+                        </a>
+                    </div>
+                `).join('');
+                document.getElementById('screenshotsContent').innerHTML = screenshotsHtml;
+            }
+
+            // Display compact first impressions in score card
+            if (data.firstImpressions) {
+                const compactHtml = Object.entries(data.firstImpressions).map(([name, imp], i) => `
+                    <div style="margin-bottom: 12px; ${i === 0 ? 'padding-left: 10px; border-left: 3px solid var(--accent);' : 'padding-left: 13px;'}">
+                        <span style="font-family: 'Space Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #666;">${name}:</span>
+                        <span style="font-size: 0.95rem;"> ${imp.firstImpression || 'No data'}</span>
+                    </div>
+                `).join('');
+                document.getElementById('firstImpressionsCompact').innerHTML = '<div style="font-family: \'Space Mono\', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 15px; color: #888;">First Impressions</div>' + compactHtml;
+            }
+
+            // Display comparison chart
+            if (data.chart) {
+                const table = document.getElementById('comparisonChart');
+                let tableHtml = '';
+
+                // Header row with links
+                tableHtml += '<thead><tr>';
+                data.chart.columns.forEach((col, i) => {
+                    const style = i === 0
+                        ? 'padding: 15px 10px; text-align: left; border-bottom: 2px solid var(--primary); font-family: "Space Mono", monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; background: var(--secondary);'
+                        : `padding: 15px 10px; text-align: left; border-bottom: 2px solid var(--primary); font-family: "Space Mono", monospace; font-size: 0.8rem; font-weight: 700; ${i === 1 ? 'background: #fff3cd;' : 'background: var(--secondary);'}`;
+
+                    // Make company names clickable
+                    const screenshotInfo = data.screenshots?.[col];
+                    const content = (i > 0 && screenshotInfo)
+                        ? `<a href="${screenshotInfo.url}" target="_blank" style="color: inherit; text-decoration: none; border-bottom: 1px solid var(--accent);">${col}</a>`
+                        : col;
+                    tableHtml += `<th style="${style}">${content}</th>`;
+                });
+                tableHtml += '</tr></thead>';
+
+                // Data rows
+                tableHtml += '<tbody>';
+                data.chart.rows.forEach(row => {
+                    tableHtml += '<tr>';
+                    tableHtml += `<td style="padding: 12px 10px; border-bottom: 1px solid var(--border); font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; color: #666; vertical-align: top; width: 120px;">${row.category}</td>`;
+                    row.values.forEach((val, i) => {
+                        const cellStyle = i === 0
+                            ? 'padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: top; background: #fffef5; font-size: 0.9rem; line-height: 1.5;'
+                            : 'padding: 12px 10px; border-bottom: 1px solid var(--border); vertical-align: top; font-size: 0.9rem; line-height: 1.5;';
+                        tableHtml += `<td style="${cellStyle}">${val || '<span style="color: #999;">—</span>'}</td>`;
+                    });
+                    tableHtml += '</tr>';
+                });
+                tableHtml += '</tbody>';
+
+                table.innerHTML = tableHtml;
+            }
+
+            // Display merged verdict (overlaps + standouts)
+            let verdictHtml = '';
+
+            // Standouts first (what makes you different)
+            if (data.standouts && data.standouts.length > 0) {
+                verdictHtml += `
+                    <div style="margin-bottom: 25px;">
+                        <div style="font-family: 'Space Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; color: #888;">What sets you apart</div>
+                        <div class="unique-phrases">
+                            ${data.standouts.map(item => `<div class="phrase-tag">${item}</div>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Overlaps (where you blend in)
+            if (data.overlaps && data.overlaps.length > 0) {
+                verdictHtml += `
+                    <div>
+                        <div style="font-family: 'Space Mono', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; color: #888;">Where you blend in</div>
+                        ${data.overlaps.map(overlap => `
+                            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border);">
+                                <span style="font-size: 0.6rem; background: ${overlap.category === 'visual' ? '#e0e0ff' : overlap.category === 'voice' ? '#e0ffe0' : '#ffe0e0'}; padding: 3px 8px; border-radius: 3px; font-family: 'Space Mono', monospace; text-transform: uppercase;">${overlap.category}</span>
+                                <span style="font-size: 0.95rem;">${overlap.pattern || overlap.observation}</span>
+                                <span style="font-size: 0.8rem; color: #888; margin-left: auto;">${(overlap.who || overlap.brands || []).join(', ')}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            document.getElementById('verdictContent').innerHTML = verdictHtml || '<p>No significant patterns found.</p>';
+
+            // Display takeaways
+            if (data.takeaways) {
+                const t = data.takeaways;
+                const takeawaysHtml = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <div>
+                            <div style="font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; color: rgba(255,255,255,0.6);">Keep</div>
+                            ${(t.keep || []).map(item => `<div style="margin-bottom: 8px; padding-left: 12px; border-left: 2px solid #4ade80;">✓ ${item}</div>`).join('') || '<div style="color: rgba(255,255,255,0.5);">—</div>'}
+                        </div>
+                        <div>
+                            <div style="font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; color: rgba(255,255,255,0.6);">Fix</div>
+                            ${(t.fix || []).map(item => `<div style="margin-bottom: 8px; padding-left: 12px; border-left: 2px solid #f87171;">✗ ${item}</div>`).join('') || '<div style="color: rgba(255,255,255,0.5);">—</div>'}
+                        </div>
+                        <div>
+                            <div style="font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; color: rgba(255,255,255,0.6);">Explore</div>
+                            ${(t.explore || []).map(item => `<div style="margin-bottom: 8px; padding-left: 12px; border-left: 2px solid #60a5fa;">→ ${item}</div>`).join('') || '<div style="color: rgba(255,255,255,0.5);">—</div>'}
+                        </div>
+                        <div>
+                            <div style="font-family: 'Space Mono', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px; color: rgba(255,255,255,0.6);">Watch</div>
+                            ${(t.watch || []).map(item => `<div style="margin-bottom: 8px; padding-left: 12px; border-left: 2px solid #fbbf24;">⚠ ${item}</div>`).join('') || '<div style="color: rgba(255,255,255,0.5);">—</div>'}
+                        </div>
+                    </div>
+                `;
+                document.getElementById('takeawaysContent').innerHTML = takeawaysHtml;
+            }
+
+            // Show results
+            document.getElementById('results').classList.add('active');
+
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Try an example button
+        document.getElementById('tryExampleBtn').addEventListener('click', () => {
+            document.getElementById('companyUrl').value = 'off-menu.com';
+            document.getElementById('companyName').value = 'Off-Menu';
+            document.getElementById('comp1Name').value = 'Slope';
+            document.getElementById('comp1Url').value = 'slope.agency';
+            document.getElementById('comp2Name').value = 'Primary';
+            document.getElementById('comp2Url').value = 'primary.studio';
+            document.getElementById('comp3Name').value = '';
+            document.getElementById('comp3Url').value = '';
+        });
+
+        // Suggest competitors button
+        document.getElementById('suggestBtn').addEventListener('click', async () => {
+            const companyUrl = document.getElementById('companyUrl').value;
+            const companyName = document.getElementById('companyName').value;
+
+            if (!companyUrl || !companyName) {
+                alert('Please enter your company name and URL first');
+                return;
+            }
+
+            const btn = document.getElementById('suggestBtn');
+            btn.textContent = 'Finding...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/api/suggest-competitors', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ companyUrl, companyName })
+                });
+
+                const data = await response.json();
+
+                if (data.competitors && data.competitors.length > 0) {
+                    const container = document.getElementById('suggestionsContainer');
+                    const list = document.getElementById('suggestionsList');
+
+                    list.innerHTML = data.competitors.map(comp => `
+                        <button type="button" class="suggestion-chip" data-name="${comp.name}" data-url="${comp.url}"
+                            style="background: white; border: 1px solid var(--border); padding: 8px 12px; font-family: 'Space Mono', monospace; font-size: 0.75rem; cursor: pointer; transition: all 0.2s;">
+                            ${comp.name} <span style="color: #999; font-size: 0.65rem;">${comp.reason}</span>
+                        </button>
+                    `).join('');
+
+                    container.style.display = 'block';
+
+                    // Add click handlers to chips
+                    list.querySelectorAll('.suggestion-chip').forEach(chip => {
+                        chip.addEventListener('click', () => {
+                            const name = chip.dataset.name;
+                            const url = chip.dataset.url;
+
+                            // Find first empty competitor slot
+                            for (let i = 1; i <= 3; i++) {
+                                const nameInput = document.getElementById('comp' + i + 'Name');
+                                const urlInput = document.getElementById('comp' + i + 'Url');
+                                if (!nameInput.value) {
+                                    nameInput.value = name;
+                                    urlInput.value = url;
+                                    chip.style.opacity = '0.5';
+                                    chip.disabled = true;
+                                    break;
+                                }
+                            }
+                        });
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching suggestions:', error);
+            }
+
+            btn.textContent = 'Suggest Competitors';
+            btn.disabled = false;
+        });
+
+        // Run again button
+        document.getElementById('runAgainBtn').addEventListener('click', () => {
+            document.getElementById('results').classList.remove('active');
+            document.getElementById('companyUrl').value = '';
+            document.getElementById('companyName').value = '';
+            document.getElementById('comp1Name').value = '';
+            document.getElementById('comp1Url').value = '';
+            document.getElementById('comp2Name').value = '';
+            document.getElementById('comp2Url').value = '';
+            document.getElementById('comp3Name').value = '';
+            document.getElementById('comp3Url').value = '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
